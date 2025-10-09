@@ -1,19 +1,21 @@
 from django.urls import reverse
-from django.contrib.auth.models import User
-from rest_framework.test import APITestCase, APIClient
+from rest_framework.test import APITestCase
 from rest_framework import status
-from rest_framework.authtoken.models import Token
 
 class RegistrationTest(APITestCase):
 
     def test_post_registration(self):
         url = reverse('registration')
-        self.token = Token.objects.create(user=self.user)
-        data = {
+        payload = {
             'username': 'testuser',
             'password': 'testpassword',
-            'token': self.token
+            'repeated_password': 'testpassword',
+            'email': 'test@email.com'
         }
-        response = self.client.post(url, data, format="json")
+        response = self.client.post(url, payload, format="json")
 
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertIn(response.status_code, [status.HTTP_200_OK, status.HTTP_201_CREATED])
+        self.assertIn("token", response.data)
+        self.assertIn("username", response.data)
+        self.assertIn("email", response.data)
+        self.assertIn("user_id", response.data)

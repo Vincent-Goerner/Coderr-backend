@@ -83,7 +83,7 @@ class LoginTokenSerializer(serializers.Serializer):
         payload_password = payload.get('password')
 
         try:
-            user = User.objects.get(email=payload_username)
+            user = User.objects.get(username=payload_username)
         except User.DoesNotExist:
             raise serializers.ValidationError("Username or password is not correct")
 
