@@ -31,6 +31,16 @@ class RegistrationSerializer(serializers.ModelSerializer):
                 'write_only': True
             }
         }
+    
+    def validate_email(self, value):
+
+        """
+        Ensures that the provided email is not already in use.
+        Raises a validation error if a duplicate is found.
+        """
+        if User.objects.filter(username=value).exists():
+            raise serializers.ValidationError('Username already exists')
+        return value
         
 
     def validate_email(self, value):
