@@ -6,7 +6,7 @@ from rest_framework.authtoken.models import Token
 from auth_app.models import UserProfile
 from auth_app.api.serializers import UserProfileSerializer
 
-class ProfileTest(APITestCase):
+class ProfileGetTest(APITestCase):
 
     def setUp(self):
         self.user = User.objects.create_user(
@@ -28,14 +28,14 @@ class ProfileTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, excepted_data)
 
-    def test_get_profile_401(self):
+    def test_get_profile_404(self):
         url = reverse('profile-detail', kwargs={'pk': 2})
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
-class ProfilTestUnauthorized(APITestCase):
+class ProfilGetTestUnauthorized(APITestCase):
     
     def setUp(self):
         self.user = User.objects.create_user(

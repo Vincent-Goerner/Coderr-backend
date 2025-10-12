@@ -1,34 +1,8 @@
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from rest_framework import serializers
+from rest_framework.authtoken.models import Token
 from auth_app.models import UserProfile
-
-
-
-class UserProfileSerializer(serializers.ModelSerializer):
-
-    user = serializers.IntegerField(source='user.id', read_only=True)
-    username = serializers.CharField(source='user.username', read_only=True)
-    email = serializers.CharField(source='user.email', read_only=True)
-    first_name = serializers.CharField(source="user.first_name", required=False)
-    last_name = serializers.CharField(source="user.last_name", required=False)
-
-    class Meta:
-        model = UserProfile
-        fields = (
-            'user',
-            'username',
-            'first_name',
-            'last_name',
-            'file',
-            'location',
-            'tel',
-            'description',
-            'working_hours',
-            'type',
-            'email',
-            'created_at'
-        )
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
@@ -39,56 +13,43 @@ class RegistrationSerializer(serializers.ModelSerializer):
     """
     username = serializers.CharField(write_only=True)
     repeated_password = serializers.CharField(write_only=True)
+    type = serializers.ChoiceField(choices=[('customer', 'Customer'), ('business', 'Business')])
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'password', 'repeated_password']
+        fields = ['username', 'email', 'password', 'repeated_password', 'type']
         extra_kwargs = {
             'password': {
                 'write_only': True
             }
-        }
-    
-    def validate_email(self, value):
-
-        """
-        Ensures that the provided email is not already in use.
-        Raises a validation error if a duplicate is found.
-        """
-        if User.objects.filter(username=value).exists():
-            raise serializers.ValidationError('Username already exists')
-        return value
-        
+        }        
 
     def validate_email(self, value):
-
         """
         Ensures that the provided email is not already in use.
         Raises a validation error if a duplicate is found.
         """
         if User.objects.filter(email=value).exists():
-            raise serializers.ValidationError('Email already exists')
+            raise serializers.ValidationError('Email already exists.')
         return value
+    
+    def create(self, validated_data):
 
-    def save(self):
+        validated_data.pop('repeated_password')
+        user_type = validated_data.pop('type', None)
 
-        """
-        Raises an error if passwords do not match or other validation fails.
-        """
-        pw = self.validated_data['password']
-        repeated_pw = self.validated_data['repeated_password']
+        if not user_type:
+            raise serializers.ValidationError("User type is requiered.")
 
-        account = User(
-            email=self.validated_data['email'], 
-            username=self.validated_data['username']
-        )
+        user = User.objects.create_user(**validated_data)
+        Token.objects.create(user=user)
 
-        if pw != repeated_pw:
-            raise serializers.ValidationError({'error': 'Passwords dont match'})
+        if not UserProfile.objects.filter(user=user).exists():
+            UserProfile.objects.create(user=user, type=user_type)
+        else:
+            print(f"UserProfile für {user.username} existiert bereits.")
         
-        account.set_password(pw)
-        account.save()
-        return account
+        return user
     
 
 class LoginTokenSerializer(serializers.Serializer):
@@ -120,3 +81,40 @@ class LoginTokenSerializer(serializers.Serializer):
 
         payload['user'] = user
         return payload
+    
+
+class UserProfileSerializer(serializers.ModelSerializer):
+
+    user = serializers.IntegerField(source='user.id', read_only=True)
+    username = serializers.CharField(source='user.username', read_only=True)
+    email = serializers.CharField(source='user.email', read_only=True)
+    first_name = serializers.CharField(source="user.first_name", required=False)
+    last_name = serializers.CharField(source="user.last_name", required=False)
+
+    class Meta:
+        model = UserProfile
+        fields = (
+            'user',
+            'username',
+            'first_name',
+            'last_name',
+            'file',
+            'location',
+            'tel',
+            'description',
+            'working_hours',
+            'type',
+            'email',
+            'created_at'
+        )
+    
+    def update(self, instance, validated_data):
+        user_data = validated_data.pop("user", {})
+        for attr, value in user_data.items():
+            setattr(instance.user, attr, value)
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.user.save()
+        instance.save()
+        return instance

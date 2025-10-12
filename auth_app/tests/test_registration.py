@@ -10,7 +10,8 @@ class RegistrationTest(APITestCase):
             'username': 'testuser',
             'password': 'testpassword',
             'repeated_password': 'testpassword',
-            'email': 'test@email.com'
+            'email': 'test@email.com',
+            'type': 'customer'
         }
         response = self.client.post(url, payload, format="json")
 

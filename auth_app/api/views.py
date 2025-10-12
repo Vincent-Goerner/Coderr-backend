@@ -5,7 +5,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.authtoken.views import ObtainAuthToken
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, PermissionDenied
 from .serializers import RegistrationSerializer, LoginTokenSerializer, UserProfileSerializer
 from auth_app.models import UserProfile
 
@@ -83,5 +83,11 @@ class ProfileDetailView(generics.RetrieveUpdateAPIView):
             profile = UserProfile.objects.get(user__id=user_id)
         except UserProfile.DoesNotExist:
             raise NotFound("No user profile found")
-        
+        except Exception as e:
+            raise PermissionDenied(f"Fehler: {str(e)}")
+
+        if self.request.method in ['PUT', 'PATCH']:
+            if self.request.user.id != profile.user.id:
+                raise PermissionDenied("You are not allowed to edit a other profile then yours.")
+            
         return profile
