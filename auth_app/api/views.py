@@ -1,11 +1,13 @@
-from rest_framework import status
+from django.contrib.auth.models import User
+from rest_framework import status, generics
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
-from django.contrib.auth.models import User
 from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.exceptions import NotFound
 from .serializers import RegistrationSerializer, LoginTokenSerializer, UserProfileSerializer
+from auth_app.models import UserProfile
 
 
 class RegistrationView(APIView):
@@ -66,3 +68,20 @@ class CustomLoginView(ObtainAuthToken):
             return Response({'400': 'Ungültige Anfragedaten.', 'Error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
         
         return Response(data)
+    
+
+class ProfileDetailView(generics.RetrieveUpdateAPIView):
+
+    serializer_class = UserProfileSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+
+        user_id = self.kwargs.get('pk')
+
+        try:
+            profile = UserProfile.objects.get(user__id=user_id)
+        except UserProfile.DoesNotExist:
+            raise NotFound("No user profile found")
+        
+        return profile

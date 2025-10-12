@@ -42,7 +42,6 @@ INSTALLED_APPS = [
     'auth_app',
     'offers',
     'orders',
-    'profiles',
     'reviews',
     'corsheaders',
     # 'django_filters',
