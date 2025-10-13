@@ -91,3 +91,23 @@ class ProfileDetailView(generics.RetrieveUpdateAPIView):
                 raise PermissionDenied("You are not allowed to edit a other profile then yours.")
             
         return profile
+    
+
+class BusinessProfileListView(APIView):
+    permission_classes = [IsAuthenticated]
+    pagination_class = None
+
+    def get(self, request):
+        business_profiles = UserProfile.objects.filter(type="business")
+        serializer = UserProfileSerializer(business_profiles, many=True)
+        return Response(serializer.data)  
+    
+
+class CustomerProfileListView(APIView):
+    permission_classes = [IsAuthenticated]
+    pagination_class = None
+
+    def get(self, request):
+        customer_profiles = UserProfile.objects.filter(type="customer")
+        serializer = UserProfileSerializer(customer_profiles, many=True)
+        return Response(serializer.data)  

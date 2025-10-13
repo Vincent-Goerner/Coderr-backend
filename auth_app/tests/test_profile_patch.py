@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 from rest_framework.authtoken.models import Token
 from auth_app.models import UserProfile
-from auth_app.api.serializers import UserProfileSerializer
+
 
 class ProfilePatchTest(APITestCase):
 
