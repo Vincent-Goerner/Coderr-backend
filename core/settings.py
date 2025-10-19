@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'orders',
     'reviews',
     'corsheaders',
-    # 'django_filters',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -65,14 +65,14 @@ CSRF_TRUSTED_ORIGINS = [
 
 CORS_ALLOW_ALL_ORIGINS = True
 
-# CORS_ALLOW_METHODS = [
-#   'GET',
-#   'POST',
-#   'PUT',
-#   'PATCH',
-#   'DELETE',
-#   'OPTIONS',
-# ]
+CORS_ALLOW_METHODS = [
+  'GET',
+  'POST',
+  'PUT',
+  'PATCH',
+  'DELETE',
+  'OPTIONS',
+]
 
 ROOT_URLCONF = 'core.urls'
 
@@ -148,18 +148,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',
+        'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
     ],
-    # 'DEFAULT_THROTTLE_CLASSES': [
-    #     'rest_framework.throttling.AnonRateThrottle',
-    # ],
-    # 'DEFAULT_THROTTLE_RATES': {
-    #     'anon': '50/day',
-    #     'user': '60/day',
-    # },
-    # 'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
-    # # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination', 
+    'DEFAULT_FILTER_BACKENDS': [
+    'django_filters.rest_framework.DjangoFilterBackend'
+    ],
 }

@@ -26,11 +26,6 @@ class OfferListTest(APITestCase):
         OfferDetails.objects.create(offer=first_offer, offer_type="standard", price=150, delivery_time_in_days=7, revisions=1, features=["Add more Feature here"])
         OfferDetails.objects.create(offer=first_offer, offer_type="premium", price=250, delivery_time_in_days=10, revisions=1, features=["You really need to add Feature here"])
 
-        # second_offer = Offer.objects.create(user=self.user, title="Nicer Designs", description="Pretty Nice tech design.")
-        # OfferDetails.objects.create(offer=second_offer, offer_type="basic", price=200, delivery_time_in_days=4, revisions=1, features=["Add Feature here"])
-        # OfferDetails.objects.create(offer=second_offer, offer_type="standard", price=350, delivery_time_in_days=8, revisions=1, features=["Add more Feature here"])
-        # OfferDetails.objects.create(offer=second_offer, offer_type="premium", price=500, delivery_time_in_days=14, revisions=1, features=["You really need to add Feature here"])    
-
     def test_get_offer_list(self):
         url = reverse('offer-list')
         response = self.client.get(url)

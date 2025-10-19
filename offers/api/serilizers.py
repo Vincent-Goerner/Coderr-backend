@@ -7,7 +7,6 @@ class OfferSerializer(serializers.ModelSerializer):
     min_price = serializers.FloatField(read_only=True)
     min_delivery_time = serializers.IntegerField(read_only=True)
     details = serializers.SerializerMethodField()
-
     class Meta:
         model = Offer
         fields = '__all__'
@@ -28,9 +27,11 @@ class OfferSerializer(serializers.ModelSerializer):
             for detail in obj.details.all()
         ]
 
+
     def create(self, validated_data):
         request = self.context.get("request")
         validated_data["user"] = request.user  
+
         details_data = self.initial_data.get("details", [])
         offer = Offer.objects.create(**validated_data)
 
@@ -43,7 +44,7 @@ class OfferSerializer(serializers.ModelSerializer):
         details = self.initial_data.get("details", None)
         method = self.context.get("request").method if self.context.get("request") else None
 
-        if method == "POST":
+        if method == "POST" or "PATCH":
             if not details or len(details) != 3:
                 raise serializers.ValidationError({
                     "non_field_errors": ["Exactly three details (basic, standard, premium) are required."]
@@ -53,14 +54,6 @@ class OfferSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError({
                     "non_field_errors": ["Details must include exactly one of each: basic, standard, premium."]
                 })
-            
-        if method == "PATCH":
-            if details:
-                for detail in details:
-                    if "offer_type" not in detail:
-                        raise serializers.ValidationError({
-                            "details": {"offer_type": ["Dieses Feld ist erforderlich."]}
-                        })
 
         return data
 
@@ -72,9 +65,35 @@ class OfferSerializer(serializers.ModelSerializer):
             offer.details.all().delete()
             for detail_data in details_data:
                 detail_data.pop('offer', None)
-                OfferDetail.objects.create(offer=offer, **detail_data)
+                OfferDetails.objects.create(offer=offer, **detail_data)
 
         return offer
     
-class OfferDetail(serializers.ModelSerializer):
-    pass
+class OfferDetailSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = OfferDetails
+        fields = '__all__'
+    
+    def validate(self, data):
+        errors = self._validate_fields(data)
+        if errors:
+            raise serializers.ValidationError(errors)
+        return data
+    
+    def _validate_fields(self, data):
+        revisions = data.get('revisions')
+        delivery_time_in_days = data.get('delivery_time_in_days')
+        features = data.get('features')
+        price = data.get('price')
+        errors = {}
+        if revisions is not None and revisions < 0:
+            errors["revisions"] = ["Revisions numbers are not allowed to be lower than 0."]
+        if delivery_time_in_days is not None and delivery_time_in_days <= 0:
+            errors["delivery_time_in_days"] = ["Delivery tim must be more than 1 day."]
+        if not features or len(features) == 0:
+            errors["features"] = ["The minimum of one feature need to be set."]
+        if price is not None and price <= 0:
+            errors["price"] = ["Price must be higher than 1."]
+        return errors
+        
