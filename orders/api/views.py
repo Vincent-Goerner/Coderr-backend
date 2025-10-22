@@ -77,3 +77,28 @@ class OrderUpdateDeleteView(RetrieveUpdateDestroyAPIView):
     def put(self, request, *args, **kwargs):
         raise MethodNotAllowed("PUT")
     
+
+class OrderCountView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, business_user_id):
+        try:
+            business_user = User.objects.get(id=business_user_id)
+        except User.DoesNotExist:
+            return Response({"detail": "No business user found with this ID."}, status=404)
+        
+        order_count = Order.objects.filter(business_user=business_user, status="in_progress").count()
+        return Response({"order_count": order_count}, status=200)  
+    
+
+class CompletedOrderCountView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, business_user_id):
+        try:
+            business_user = User.objects.get(id=business_user_id)
+        except User.DoesNotExist:
+            return Response({"detail": "No business user found with this ID."}, status=404)
+        
+        completed_order_count = Order.objects.filter(business_user=business_user, status="completed").count()
+        return Response({"completed_order_count": completed_order_count}, status=200)
