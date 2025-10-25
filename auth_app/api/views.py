@@ -117,7 +117,7 @@ class CustomerProfileListView(APIView):
     
 
 class BaseInfoView(APIView):
-    permission_classes = [AllowAny]  
+    permission_classes = [AllowAny]
 
     def get(self, request, *args, **kwargs):
         review_count = Review.objects.count()
