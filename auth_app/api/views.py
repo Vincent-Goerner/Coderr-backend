@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.db.models import Avg
 from rest_framework import status, generics
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -8,6 +9,8 @@ from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.exceptions import NotFound, PermissionDenied
 from .serializers import RegistrationSerializer, LoginTokenSerializer, UserProfileSerializer
 from auth_app.models import UserProfile
+from reviews.models import Review
+from offers.models import Offer
 
 
 class RegistrationView(APIView):
@@ -111,3 +114,23 @@ class CustomerProfileListView(APIView):
         customer_profiles = UserProfile.objects.filter(type="customer")
         serializer = UserProfileSerializer(customer_profiles, many=True)
         return Response(serializer.data)  
+    
+
+class BaseInfoView(APIView):
+    permission_classes = [AllowAny]  
+
+    def get(self, request, *args, **kwargs):
+        review_count = Review.objects.count()
+        average_rating = Review.objects.aggregate(average_rating=Avg('rating'))['average_rating']
+        average_rating = round(average_rating, 1) if average_rating is not None else 0
+        business_profile_count = UserProfile.objects.filter(type='business').count()
+        offer_count = Offer.objects.count()
+
+        data = {
+            "review_count": review_count,
+            "average_rating": average_rating,
+            "business_profile_count": business_profile_count,
+            "offer_count": offer_count,
+        }
+        
+        return Response(data) 
