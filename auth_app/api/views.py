@@ -1,4 +1,3 @@
-from django.contrib.auth.models import User
 from django.db.models import Avg
 from rest_framework import status, generics
 from rest_framework.views import APIView
@@ -74,12 +73,18 @@ class CustomLoginView(ObtainAuthToken):
     
 
 class ProfileDetailView(generics.RetrieveUpdateAPIView):
-
+    """
+    API view to retrieve or update a user's profile.
+    Allows only authenticated users and restricts edits to the profile owner.
+    """
     serializer_class = UserProfileSerializer
     permission_classes = [IsAuthenticated]
 
     def get_object(self):
-
+        """
+        Retrieves the requested user profile and checks edit permissions.
+        Raises errors if the profile doesn't exist or the user isn't the owner.
+        """
         user_id = self.kwargs.get('pk')
 
         try:
@@ -97,9 +102,17 @@ class ProfileDetailView(generics.RetrieveUpdateAPIView):
     
 
 class BaseInfoView(APIView):
+    """
+    Public API view returning basic platform statistics.
+    Provides counts for reviews, business profiles, offers, and the average rating.
+    """
     permission_classes = [AllowAny]
 
     def get(self, request, *args, **kwargs):
+        """
+        Returns general platform statistics including reviews, ratings, 
+        business profiles, and offers for public access.
+        """
         review_count = Review.objects.count()
         average_rating = Review.objects.aggregate(average_rating=Avg('rating'))['average_rating']
         average_rating = round(average_rating, 1) if average_rating is not None else 0
@@ -117,20 +130,36 @@ class BaseInfoView(APIView):
     
 
 class BusinessProfileListView(APIView):
+    """
+    API view for authenticated users to retrieve all business profiles.
+    Returns serialized data for profiles of type 'business'.
+    """
     permission_classes = [IsAuthenticated]
     pagination_class = None
 
     def get(self, request):
+        """
+        Retrieves and returns all business-type user profiles 
+        as serialized data for authenticated users.
+        """
         business_profiles = UserProfile.objects.filter(type="business")
         serializer = UserProfileSerializer(business_profiles, many=True)
         return Response(serializer.data)  
     
 
 class CustomerProfileListView(APIView):
+    """
+    API view for authenticated users to retrieve all customer profiles.
+    Returns serialized data for profiles of type 'customer'.
+    """
     permission_classes = [IsAuthenticated]
     pagination_class = None
 
     def get(self, request):
+        """
+        Retrieves and returns all customer-type user profiles 
+        as serialized data for authenticated users.
+        """
         customer_profiles = UserProfile.objects.filter(type="customer")
         serializer = UserProfileSerializer(customer_profiles, many=True)
         return Response(serializer.data)  

@@ -8,6 +8,10 @@ TYPE_SELECTION = (
 )
 
 class UserProfile(models.Model):
+    """
+    Model representing a user profile with personal, contact, and business info.
+    Linked one-to-one with Django's User model and stores profile-specific fields.
+    """
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     file = models.ImageField(upload_to="profile_pics/", null=True, blank=True)
     location = models.CharField(max_length=100, blank=True)

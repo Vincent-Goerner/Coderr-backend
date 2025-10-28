@@ -3,6 +3,11 @@ from django.contrib.auth.models import User
 
 
 class Offer(models.Model):
+    """
+    Model representing an offer created by a user, including title, image, and description.
+    Tracks creation and last update timestamps.
+    Linked to the User model via a foreign key.
+    """
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="offer")
     title = models.CharField(max_length=255)
     image = models.ImageField(upload_to="offers_pics/", null=True, blank=True)
@@ -15,6 +20,11 @@ class Offer(models.Model):
 
 
 class OfferDetails(models.Model):
+    """
+    Model representing the details of an Offer, including title, price, delivery time, and features.
+    Supports three types of packages: basic, standard, and premium.
+    Linked to an Offer via a foreign key with a related name 'details'.
+    """
     PAKET_TYPES = (
         ('basic', 'Basic'),
         ('standard', 'Standard'),

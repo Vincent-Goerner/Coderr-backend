@@ -9,6 +9,11 @@ from orders.models import Order
 
 
 class ReviewListCreateView(generics.ListCreateAPIView):
+    """
+    Lists all reviews and allows authenticated customers to create reviews.
+    Filters by business_user_id and reviewer_id, supports ordering by updated_at or rating.
+    perform_create: ensures only customers with completed orders can review a business_user.
+    """
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
@@ -18,6 +23,10 @@ class ReviewListCreateView(generics.ListCreateAPIView):
     pagination_class = None
 
     def perform_create(self, serializer):
+        """
+        Validates that the requester is a customer, a business_user is specified,
+        and a completed order exists before saving the review.
+        """
         user = self.request.user
 
         if not user.profile.type == 'customer':
@@ -36,26 +45,39 @@ class ReviewListCreateView(generics.ListCreateAPIView):
 
 
 class ReviewDetailsView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    API view to retrieve, update, or delete a Review.
+    Only the review creator or staff can update or delete.
+    GET and PUT methods are explicitly disallowed.
+    """
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
     permission_classes = [IsAuthenticated]
 
     def perform_update(self, serializer):
-      
+        """
+        Update a review instance if requester is creator or staff.
+        Raises PermissionDenied otherwise.
+        """
         if serializer.instance.reviewer != self.request.user and not self.request.user.is_staff:
             raise PermissionDenied(
                 "Only the creator or an admin can edit a review.")
         serializer.save()
 
     def perform_destroy(self, instance):
-    
+        """
+        Delete a review instance if requester is creator or staff.
+        Raises PermissionDenied otherwise.
+        """
         if instance.reviewer != self.request.user and not self.request.user.is_staff:
             raise PermissionDenied(
                 "Only the creator or an admin can delete a review.")
         instance.delete()
 
     def update(self, request, *args, **kwargs):
-       
+        """
+        Handles the update request with partial update support.
+        """
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
         serializer = self.get_serializer(
@@ -65,8 +87,10 @@ class ReviewDetailsView(generics.RetrieveUpdateDestroyAPIView):
         return Response(serializer.data)
     
     def get(self, request, *args, **kwargs):
+        """GET method not allowed for this endpoint."""
         raise MethodNotAllowed("GET")
     
     
     def put(self, request, *args, **kwargs):
+        """PUT method not allowed for this endpoint."""
         raise MethodNotAllowed("PUT")

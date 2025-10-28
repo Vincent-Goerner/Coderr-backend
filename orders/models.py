@@ -3,7 +3,11 @@ from django.contrib.auth.models import User
 
 
 class Order (models.Model):
-    
+    """
+    Represents an order between a customer and a business user, including title, price, features, package type, and status.
+    PAKET_TYPES: basic, standard, premium; STATUS: in_progress, completed, cancelled.
+    Tracks creation and update timestamps, delivery time, and allowed revisions.
+    """
     PAKET_TYPES = (
         ('basic', 'Basic'),
         ('standard', 'Standard'),
@@ -13,7 +17,7 @@ class Order (models.Model):
     STATUS = (
         ('in_progress', 'In Progress'),
         ('completed', 'Completed'),
-        ('canceled', 'Canceled')
+        ('cancelled', 'Cancelled')
     )
 
     customer_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='cutsomer_user')

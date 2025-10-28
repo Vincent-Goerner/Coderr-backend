@@ -6,7 +6,6 @@ from auth_app.models import UserProfile
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
-
     """
     Serializer for user registration handling full name parsing and password validation.
     Ensures email uniqueness and matching passwords before creating a new user.
@@ -47,13 +46,12 @@ class RegistrationSerializer(serializers.ModelSerializer):
         if not UserProfile.objects.filter(user=user).exists():
             UserProfile.objects.create(user=user, type=user_type)
         else:
-            print(f"UserProfile für {user.username} existiert bereits.")
+            print(f"Use-profile for {user.username} already exist.")
         
         return user
     
 
 class LoginTokenSerializer(serializers.Serializer):
-
     """
     Serializer to validate user credentials and authenticate by username and password.
     Adds authenticated user to validated data or raises validation error on failure.
@@ -62,7 +60,6 @@ class LoginTokenSerializer(serializers.Serializer):
     password = serializers.CharField()
 
     def validate(self, payload):
-
         """
         Authenticates the user using username and password.
         Adds the authenticated user to the validated payload or raises an error on failure.
@@ -84,7 +81,10 @@ class LoginTokenSerializer(serializers.Serializer):
     
 
 class UserProfileSerializer(serializers.ModelSerializer):
-
+    """
+    Serializer for managing UserProfile data, including nested User fields.
+    Supports reading user info and updating both User and UserProfile instances.
+    """
     user = serializers.IntegerField(source='user.id', read_only=True)
     username = serializers.CharField(source='user.username', read_only=True)
     email = serializers.CharField(source='user.email', read_only=True)
@@ -109,6 +109,10 @@ class UserProfileSerializer(serializers.ModelSerializer):
         )
     
     def update(self, instance, validated_data):
+        """
+        Updates both User and UserProfile instances with validated data.
+        Extracts nested user fields, applies changes, and saves both models.
+        """
         user_data = validated_data.pop("user", {})
         for attr, value in user_data.items():
             setattr(instance.user, attr, value)

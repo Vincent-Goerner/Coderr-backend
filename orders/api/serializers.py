@@ -6,6 +6,10 @@ from offers.models import OfferDetails
 
 
 class OrderSerializer(serializers.ModelSerializer):
+    """
+    Serializer for Order model, handling conversion between Order instances and JSON,
+    including all relevant fields such as customer, business, title, price, status, and timestamps.
+    """
     price = serializers.FloatField()
     class Meta:
         model = Order
@@ -24,7 +28,12 @@ class OrderSerializer(serializers.ModelSerializer):
             "updated_at"
         ]
 
+
 class OrderCreateSerializer(serializers.ModelSerializer):
+    """
+    Serializer for creating Orders from an OfferDetail ID, validates revisions,
+    assigns customer and business users, and returns the created Order via OrderSerializer.
+    """
     offer_detail_id = serializers.IntegerField(write_only=True)
 
     class Meta:
@@ -32,6 +41,10 @@ class OrderCreateSerializer(serializers.ModelSerializer):
         fields = ["offer_detail_id"]
 
     def create(self, validated_data):
+        """
+        Creates a new Order from a provided offer_detail_id, validates revisions,
+        assigns customer and business users, and sets order fields based on the OfferDetails.
+        """
         offer_detail_id = validated_data.pop("offer_detail_id")
         offer_detail = get_object_or_404(OfferDetails, id=offer_detail_id)
         offer = offer_detail.offer
@@ -57,10 +70,18 @@ class OrderCreateSerializer(serializers.ModelSerializer):
         return order
 
     def to_representation(self, instance):
+        """
+        Returns the serialized representation of the Order instance using OrderSerializer,
+        ensuring consistent output format for API responses.
+        """
         return OrderSerializer(instance, context=self.context).data
     
+    
 class OrderUpdateSerializer(serializers.ModelSerializer):
-
+    """
+    Serializer for updating Orders; only allows the 'status' field to be modified,
+    and raises a ValidationError if any other fields are included in the update.
+    """
     class Meta:
         model = Order
         fields = [
@@ -79,6 +100,10 @@ class OrderUpdateSerializer(serializers.ModelSerializer):
         ]
 
     def update(self, instance, validated_data):
+        """
+        Updates an Order instance, allowing only the 'status' field to be modified.
+        Raises a ValidationError if any other fields are included in the update.
+        """
         allowed_fields = {"status"}
         invalid_fields = set(validated_data.keys()) - allowed_fields
 

@@ -1,9 +1,13 @@
-from django.contrib.auth.models import User
 from rest_framework import serializers
 from offers.models import Offer, OfferDetails
 
 
 class OfferSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the Offer model including nested OfferDetails.
+    Handles creation, update, and validation of exactly three details (basic, standard, premium).
+    Provides read-only aggregated fields like min_price and min_delivery_time.
+    """
     min_price = serializers.FloatField(read_only=True)
     min_delivery_time = serializers.IntegerField(read_only=True)
     details = serializers.SerializerMethodField()
@@ -13,6 +17,9 @@ class OfferSerializer(serializers.ModelSerializer):
         read_only_fields = ['user']
 
     def get_details(self, obj):
+        """
+        Returns a serialized list of related OfferDetails for the given Offer.
+        """
         return [
             {
                 "id": detail.id,
@@ -29,6 +36,9 @@ class OfferSerializer(serializers.ModelSerializer):
 
 
     def create(self, validated_data):
+        """
+        Creates an Offer and its nested OfferDetails, linking the current user automatically.
+        """
         request = self.context.get("request")
         validated_data["user"] = request.user  
 
@@ -41,6 +51,10 @@ class OfferSerializer(serializers.ModelSerializer):
         return offer
 
     def validate(self, data):
+        """
+        Ensures exactly three details are provided: basic, standard, and premium.
+        Raises ValidationError if the requirements are not met.
+        """
         details = self.initial_data.get("details", None)
         method = self.context.get("request").method if self.context.get("request") else None
 
@@ -58,6 +72,9 @@ class OfferSerializer(serializers.ModelSerializer):
         return data
 
     def update(self, instance, validated_data):
+        """
+        Updates an Offer and replaces its nested OfferDetails if new details are provided.
+        """
         details_data = self.initial_data.get("details", None)
         offer = super().update(instance, validated_data)
 
@@ -69,19 +86,35 @@ class OfferSerializer(serializers.ModelSerializer):
 
         return offer
     
-class OfferDetailSerializer(serializers.ModelSerializer):
     
+class OfferDetailSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the OfferDetails model.
+    Handles validation for revisions, delivery time, features, and price fields.
+    Ensures all fields meet business rules before saving.
+    """    
     class Meta:
         model = OfferDetails
         fields = '__all__'
     
     def validate(self, data):
+        """
+        Validates OfferDetails fields and raises a ValidationError if any constraints are violated.
+        """
         errors = self._validate_fields(data)
         if errors:
             raise serializers.ValidationError(errors)
         return data
     
     def _validate_fields(self, data):
+        """
+        Performs field-level checks:
+        - revisions must be >= 0
+        - delivery_time_in_days must be > 0
+        - at least one feature is required
+        - price must be > 0
+        Returns a dictionary of errors if present.
+        """
         revisions = data.get('revisions')
         delivery_time_in_days = data.get('delivery_time_in_days')
         features = data.get('features')

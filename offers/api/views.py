@@ -1,14 +1,11 @@
-from django.contrib.auth.models import User
 from django.db.models import Q
 from django.db.models import Min
 from django.shortcuts import get_object_or_404
 from rest_framework import status, generics
 from rest_framework.generics import ListCreateAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
-from rest_framework.authtoken.views import ObtainAuthToken
-from rest_framework.exceptions import NotFound, PermissionDenied
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.exceptions import ValidationError
 from .pagination import StandardResultsSetPagination
 from offers.offers_ordering.offers_ordering import OrderingHelperOffers
@@ -18,53 +15,67 @@ from auth_app.models import UserProfile
 
 
 class OfferListCreateView(ListCreateAPIView):
+    """
+    API view for listing all offers and creating new ones.
+    Supports filtering, search, ordering, and annotated fields like min_price and min_delivery_time.
+    Creation is restricted to authenticated business users only.
+    """
     serializer_class = OfferSerializer
     pagination_class = StandardResultsSetPagination
 
     def get_permissions(self):
+        """
+        Returns authentication permissions based on request method:
+        - POST requires authentication
+        - GET is open to any user
+        """
         if self.request.method == 'POST':
             return [IsAuthenticated()]
         return [AllowAny()]
 
     def get_queryset(self):
-        queryset = Offer.objects.all()
-        content_params = self.request.query_params
-        creator_id = content_params.get('creator_id', None)
-        search = content_params.get('search', '')
-        max_delivery_time = content_params.get('max_delivery_time', None)
-        min_price = content_params.get('min_price', None)
+        """
+        Returns a filtered and annotated queryset of offers.
+        Supports query parameters: creator_id, search, max_delivery_time, min_price, ordering.
+        """
+        params = self.request.query_params
+        offers = Offer.objects.all()
 
-        queryset = queryset.annotate(
+        offers = offers.annotate(
             min_price=Min('details__price'),
             min_delivery_time=Min('details__delivery_time_in_days')
         )
 
-        if creator_id is not None:
-            queryset = queryset.filter(user_id=creator_id)
+        if (creator_id := params.get('creator_id')):
+            offers = offers.filter(user_id=creator_id)
 
-        if search is not '':
-            queryset = queryset.filter(
+        if (search := params.get('search', '')):
+            offers = offers.filter(
                 Q(title__icontains=search) | Q(description__icontains=search)
             )
         
-        if max_delivery_time is not None:
+        if (max_delivery_time := params.get('max_delivery_time')):
             try:
-                queryset = queryset.filter(details__delivery_time_in_days__lte=int(max_delivery_time))
+                offers = offers.filter(details__delivery_time_in_days__lte=int(max_delivery_time))
             except ValueError:
                 raise ValidationError({"max_delivery_time": "Need to be a integer."})
             
-        if min_price is not None:
+        if (min_price := params.get('min_price')):
             try:
-                queryset = queryset.filter(min_price__gte=float(min_price))
+                offers = offers.filter(min_price__gte=float(min_price))
             except ValueError:
-                raise ValidationError({"min_price": "Need to be from type number."})
-        
-        ordering = content_params.get('ordering')
-        queryset = OrderingHelperOffers.apply_ordering(queryset, ordering)
+                raise ValidationError({"min_price": "Need to be a number."})
+            
+        ordering = params.get('ordering')
+        offers = OrderingHelperOffers.apply_ordering(offers, ordering)
 
-        return queryset
+        return offers
 
     def perform_create(self, serializer):
+        """
+        Validates that the user has a business profile and saves the offer with the current user.
+        Raises PermissionDenied if the profile is missing or not a business type.
+        """
         user = self.request.user
 
         try:
@@ -79,9 +90,18 @@ class OfferListCreateView(ListCreateAPIView):
 
 
 class OfferDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    API view to retrieve, update, or delete a single offer.
+    Annotates offers with min_price and min_delivery_time for GET responses.
+    Update and delete operations are restricted to the offer creator.
+    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request, pk, format=None):
+        """
+        Retrieves a single offer by ID with annotated fields.
+        Returns 404 if the offer does not exist.
+        """
         offer = get_object_or_404(
             Offer.objects.annotate(
                 min_price=Min('details__price'),
@@ -93,6 +113,11 @@ class OfferDetailView(generics.RetrieveUpdateDestroyAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
     
     def patch(self, request, pk, format=None):
+        """
+        Partially updates an offer if the requesting user is the creator.
+        Returns 403 if the user is not the owner.
+        """
+
         offer = get_object_or_404(Offer, pk=pk)
         
         if offer.user != request.user:
@@ -107,6 +132,10 @@ class OfferDetailView(generics.RetrieveUpdateDestroyAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def delete(self, request, pk, format=None):
+        """
+        Deletes an offer if the requesting user is the creator.
+        Returns 403 if the user is not the owner.
+        """
         offer = get_object_or_404(Offer, pk=pk)
         if offer.user != request.user:
             raise PermissionDenied("Only the creator can delete the offer.")
@@ -114,7 +143,13 @@ class OfferDetailView(generics.RetrieveUpdateDestroyAPIView):
         offer.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
+    
 class OfferDetailOverviewView(generics.RetrieveAPIView):
+    """
+    API view to retrieve a single OfferDetail by ID.
+    Returns serialized data for the requested offer detail.
+    Access restricted to authenticated users.
+    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request, pk, format=None):
