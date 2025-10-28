@@ -42,7 +42,7 @@ Coderr is a Django-based Offer Management System developed as part of the Develo
 ### Local Setup
 ```bash
 # 1. Clone the repository
-git clone https://github.com/OgulcanErdag/Coderr_Backend.git
+git clone https://github.com/Vincent-Goerner/Coderr-Backend.git
 cd coderr-backend
 
 # 2. Create virtual environment
