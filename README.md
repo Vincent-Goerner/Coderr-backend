@@ -1,4 +1,4 @@
-# Coderr Offer Management System
+# Coderr
 
 ## 🔍 Overview
 Coderr is a Django-based Offer Management System developed as part of the Developer Akademie program. It allows registered users to create offers, place orders, manage profiles, and leave reviews. The system supports pagination, filtering, secure authentication, and a clean API structure.
@@ -124,8 +124,6 @@ Naming: snake_case for functions and variables
 No dead/commented-out code
 
 PEP-8 Compliance: All Python files follow PEP-8 guidelines
-
-Optional: use black and isort for formatting
 
 ## 🚫 Security & .env
 
