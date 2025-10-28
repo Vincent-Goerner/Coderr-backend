@@ -64,42 +64,55 @@ python manage.py runserver
 ## 🚀 API Endpoints (Examples)
 
 ### ✍️ Offers
-Method	Endpoint	Description
-GET	/api/offers/	List all offers (supports filtering & pagination)
-POST	/api/offers/	Create a new offer
-GET	/api/offers/{id}/	Retrieve a single offer
-PATCH	/api/offers/{id}/	Update offer (only owner)
-DELETE	/api/offers/{id}/	Delete offer (only owner)
-GET	/api/offerdetails/{id}/	Retrieve specific offer detail
+| Method | Endpoint                | Description                                       |
+| ------ | ----------------------- | ------------------------------------------------- |
+| GET    | /api/offers/            | List all offers (supports filtering & pagination) |
+| POST   | /api/offers/            | Create a new offer                                |
+| GET    | /api/offers/{id}/       | Retrieve a single offer                           |
+| PATCH  | /api/offers/{id}/       | Update offer (only owner)                         |
+| DELETE | /api/offers/{id}/       | Delete offer (only owner)                         |
+| GET    | /api/offerdetails/{id}/ | Retrieve specific offer detail                    |
+
 
 ### 📦 Orders
-Method	Endpoint	Description
-GET	/api/orders/	View your orders
-POST	/api/orders/	Place a new order
-PATCH	/api/orders/{id}/	Update order status (only business user)
+| Method | Endpoint          | Description                              |
+| ------ | ----------------- | ---------------------------------------- |
+| GET    | /api/orders/      | View your orders                         |
+| POST   | /api/orders/      | Place a new order                        |
+| PATCH  | /api/orders/{id}/ | Update order status (only business user) |
+
 
 ### ⭐ Reviews
-Method	Endpoint	Description
-GET	/api/reviews/	List reviews
-POST	/api/reviews/	Create review
-PATCH	/api/reviews/{id}/	Update review
-DELETE	/api/reviews/{id}/	Delete review
+| Method | Endpoint           | Description   |
+| ------ | ------------------ | ------------- |
+| GET    | /api/reviews/      | List reviews  |
+| POST   | /api/reviews/      | Create review |
+| PATCH  | /api/reviews/{id}/ | Update review |
+| DELETE | /api/reviews/{id}/ | Delete review |
+
 
 ### 👤 Profiles
 Method	Endpoint	Description
-GET	/api/profile/{id}/	View profile
-PATCH	/api/profile/{id}/	Update profile
-GET	/api/profiles/business/	List all business profiles
-GET	/api/profiles/customer/	List all customer profiles
+| Method | Endpoint                | Description                |
+| ------ | ----------------------- | -------------------------- |
+| GET    | /api/profile/{id}/      | View profile               |
+| PATCH  | /api/profile/{id}/      | Update profile             |
+| GET    | /api/profiles/business/ | List all business profiles |
+| GET    | /api/profiles/customer/ | List all customer profiles |
+
 
 ### 🔐 Authentication
-Method	Endpoint
-POST	/api/login/
-POST	/api/registration/
+| Method | Endpoint           |
+| ------ | ------------------ |
+| POST   | /api/login/        |
+| POST   | /api/registration/ |
+
 
 ### 📊 Miscellaneous
-Method	Endpoint	Description
-GET	/api/base-info/	General platform statistics
+| Method | Endpoint        | Description                 |
+| ------ | --------------- | --------------------------- |
+| GET    | /api/base-info/ | General platform statistics |
+
 
 
 ## 🔧 Development Standards
