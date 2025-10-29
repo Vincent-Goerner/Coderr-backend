@@ -1,3 +1,9 @@
+# Django Migrations ausschließen
+**/migrations/*
+
+# aber die __init__.py in migrations behalten (sonst erkennt Python das Paket nicht)
+!**/migrations/__init__.py
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
