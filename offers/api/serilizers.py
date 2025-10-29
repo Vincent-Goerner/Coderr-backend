@@ -58,7 +58,7 @@ class OfferSerializer(serializers.ModelSerializer):
         details = self.initial_data.get("details", None)
         method = self.context.get("request").method if self.context.get("request") else None
 
-        if method == "POST" or "PATCH":
+        if method == "POST":
             if not details or len(details) != 3:
                 raise serializers.ValidationError({
                     "non_field_errors": ["Exactly three details (basic, standard, premium) are required."]
@@ -68,6 +68,14 @@ class OfferSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError({
                     "non_field_errors": ["Details must include exactly one of each: basic, standard, premium."]
                 })
+            
+        if method == "PATCH":
+            if details:
+                for detail in details:
+                    if "offer_type" not in detail:
+                        raise serializers.ValidationError({
+                            "details": {"offer_type": ["Dieses Feld ist erforderlich."]}
+                        })
 
         return data
 
@@ -95,7 +103,7 @@ class OfferDetailSerializer(serializers.ModelSerializer):
     """    
     class Meta:
         model = OfferDetails
-        fields = '__all__'
+        fields = ['id', 'title', 'revisions', 'delivery_time_in_days', 'price', 'features', 'offer_type']
     
     def validate(self, data):
         """
