@@ -81,16 +81,26 @@ class OfferSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         """
-        Updates an Offer and replaces its nested OfferDetails if new details are provided.
+        Updates an Offer and partially updates its nested OfferDetails if provided.
         """
         details_data = self.initial_data.get("details", None)
         offer = super().update(instance, validated_data)
 
         if details_data is not None:
-            offer.details.all().delete()
             for detail_data in details_data:
-                detail_data.pop('offer', None)
-                OfferDetails.objects.create(offer=offer, **detail_data)
+                offer_type = detail_data.get("offer_type")
+                if not offer_type:
+                    continue
+
+                detail_obj = offer.details.filter(offer_type=offer_type).first()
+                if detail_obj:
+                    for field, value in detail_data.items():
+                        if field not in ["id", "offer_type", "offer"]:
+                            setattr(detail_obj, field, value)
+                    detail_obj.save()
+                else:
+                    detail_data.pop("offer", None)
+                    OfferDetails.objects.create(offer=offer, **detail_data)
 
         return offer
     
