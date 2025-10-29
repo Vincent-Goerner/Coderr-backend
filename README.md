@@ -42,22 +42,35 @@ Coderr is a Django-based Offer Management System developed as part of the Develo
 ### Local Setup
 ```bash
 # 1. Clone the repository
+
 git clone https://github.com/Vincent-Goerner/Coderr-Backend.git
 cd coderr-backend
 
 # 2. Create virtual environment
+
 python -m venv env
-source env/bin/activate   # On Windows: env\Scripts\activate
+
+#Mac and Linux:
+source env/bin/activate
+
+# On Windows:
+env\Scripts\activate
 
 # 3. Install dependencies
+
 pip install -r requirements.txt
 
-# 4. Create a .env file (see .env.example)
+# 4. Run migrations
 
-# 5. Run migrations
+python manage.py makemigrations
 python manage.py migrate
 
+# 5. create superuser
+
+python manage.py createsuperuser
+
 # 6. Start development server
+
 python manage.py runserver
 ```
 
