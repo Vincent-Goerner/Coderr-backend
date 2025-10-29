@@ -1,5 +1,6 @@
 # Django Migrations ausschließen
 **/migrations/*
+*/migrations/*
 
 # aber die __init__.py in migrations behalten (sonst erkennt Python das Paket nicht)
 !**/migrations/__init__.py
