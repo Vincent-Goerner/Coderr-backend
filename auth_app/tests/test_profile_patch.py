@@ -31,15 +31,20 @@ class ProfilePatchTest(APITestCase):
     def test_patch_profile_sucessful(self):
         url = reverse('profile-detail', kwargs={'pk': self.user.id})
         patch_data = {
-            "username": "testuser2",
             "first_name": "Max",
             "last_name": "Mustermann",
             "location": "Dresden",
-            "tel": 28374892374
+            "email": "user@email.com",
+            "tel": "28374892374"
         }
         response = self.client.patch(url, patch_data, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["first_name"], "Max")
+        self.assertEqual(response.data["last_name"], "Mustermann")
+        self.assertEqual(response.data["location"], "Dresden")
+        self.assertEqual(response.data["email"], "user@email.com")
+        self.assertEqual(response.data["tel"], "28374892374")        
 
     def test_patch_profile_404(self):
         url = reverse('profile-detail', kwargs={'pk': 9999})
