@@ -15,7 +15,7 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     file = models.ImageField(upload_to="profile_pics/", null=True, blank=True)
     location = models.CharField(max_length=100, blank=True)
-    tel = models.CharField(blank=True)
+    tel = models.CharField(blank=True, default='')
     description = models.CharField(max_length=255, blank=True)
     working_hours = models.CharField(max_length=10, blank=True)
     type = models.CharField(max_length=9, choices=TYPE_SELECTION)
