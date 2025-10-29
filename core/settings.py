@@ -172,5 +172,7 @@ REST_FRAMEWORK = {
     ],
 
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 6,  
+    'PAGE_SIZE': 6,
+
+    'DATETIME_FORMAT': "%Y-%m-%dT%H:%M:%SZ",
 }

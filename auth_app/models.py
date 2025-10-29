@@ -17,7 +17,7 @@ class UserProfile(models.Model):
     location = models.CharField(max_length=100, blank=True)
     tel = models.CharField(blank=True, default='')
     description = models.CharField(max_length=255, blank=True)
-    working_hours = models.CharField(max_length=10, blank=True)
+    working_hours = models.CharField(blank=True)
     type = models.CharField(max_length=9, choices=TYPE_SELECTION)
     created_at = models.DateTimeField(auto_now_add=True)
 
