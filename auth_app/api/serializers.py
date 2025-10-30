@@ -32,6 +32,11 @@ class RegistrationSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Email already exists.')
         return value
     
+    def validate_password(self, data):
+        if data['password'] != data['repeated_password']:
+            raise serializers.ValidationError("Passwords dont match.")
+        return data
+    
     def create(self, validated_data):
 
         validated_data.pop('repeated_password')
