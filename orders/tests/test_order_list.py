@@ -50,7 +50,7 @@ class OrderPostTest(APITestCase):
         )
         self.detail = OfferDetails.objects.create(
             offer = self.offer,
-            title = "Test Offer",
+            title = "Test Offer Detail",
             revisions=2,
             delivery_time_in_days=7, 
             price=75,
@@ -66,3 +66,10 @@ class OrderPostTest(APITestCase):
         response = self.client.post(url, payload, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["title"], "Test Offer Detail")
+        self.assertEqual(response.data["revisions"], 2)
+        self.assertEqual(response.data["delivery_time_in_days"], 7)
+        self.assertEqual(response.data["price"], 75)
+        self.assertEqual(response.data["features"], ["Logo Design", "Visitenkarte"])
+        self.assertEqual(response.data["offer_type"], "basic")
+        self.assertEqual(response.data["status"], "in_progress")

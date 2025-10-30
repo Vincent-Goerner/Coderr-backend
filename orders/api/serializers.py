@@ -59,7 +59,7 @@ class OrderCreateSerializer(serializers.ModelSerializer):
         order = Order.objects.create(
             customer_user=customer_user,
             business_user=business_user,
-            title=offer.title,
+            title=offer_detail.title,
             revisions=offer_detail.revisions,
             delivery_time_in_days=offer_detail.delivery_time_in_days,
             price=offer_detail.price,
