@@ -10,7 +10,6 @@ class RegistrationSerializer(serializers.ModelSerializer):
     Serializer for user registration handling full name parsing and password validation.
     Ensures email uniqueness and matching passwords before creating a new user.
     """
-    username = serializers.CharField(write_only=True)
     repeated_password = serializers.CharField(write_only=True)
     type = serializers.ChoiceField(choices=[('customer', 'Customer'), ('business', 'Business')])
 
