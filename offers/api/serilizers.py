@@ -13,7 +13,7 @@ class OfferSerializer(serializers.ModelSerializer):
     details = serializers.SerializerMethodField()
     class Meta:
         model = Offer
-        fields = '__all__'
+        fields = ['id', 'user', 'title', 'image', 'description', 'created_at', 'updated_at', 'details', 'min_price', 'min_delivery_time']
         read_only_fields = ['user']
 
     def get_details(self, obj):
