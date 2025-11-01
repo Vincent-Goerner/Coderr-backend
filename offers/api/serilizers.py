@@ -13,7 +13,18 @@ class OfferSerializer(serializers.ModelSerializer):
     details = serializers.SerializerMethodField()
     class Meta:
         model = Offer
-        fields = ['id', 'user', 'title', 'image', 'description', 'created_at', 'updated_at', 'details', 'min_price', 'min_delivery_time']
+        fields = [
+            'id', 
+            'user', 
+            'title', 
+            'image', 
+            'description', 
+            'created_at', 
+            'updated_at', 
+            'details', 
+            'min_price', 
+            'min_delivery_time'
+        ]
         read_only_fields = ['user']
 
     def get_details(self, obj):
@@ -110,7 +121,15 @@ class OfferDetailSerializer(serializers.ModelSerializer):
     """    
     class Meta:
         model = OfferDetails
-        fields = ['id', 'title', 'revisions', 'delivery_time_in_days', 'price', 'features', 'offer_type']
+        fields = [
+            'id', 
+            'title', 
+            'revisions', 
+            'delivery_time_in_days', 
+            'price', 
+            'features', 
+            'offer_type'
+        ]
     
     def validate(self, data):
         """
