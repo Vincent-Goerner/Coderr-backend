@@ -1,16 +1,3 @@
-# Migrations nur für bestimmte Apps ignorieren
-# auth_app/migrations/*.py
-# !auth_app/migrations/__init__.py
-
-# offers/migrations/*.py
-# !offers/migrations/__init__.py
-
-# orders/migrations/*.py
-# !orders/migrations/__init__.py
-
-# reviews/migrations/*.py
-# !reviews/migrations/__init__.py
-
 # Virtuelle Umgebung ignorieren
 env/
 venv/

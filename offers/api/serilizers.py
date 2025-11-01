@@ -17,16 +17,16 @@ class OfferSerializer(serializers.ModelSerializer):
         read_only_fields = ['user']
 
     def get_details(self, obj):
-        """
-        Returns a serialized list of related OfferDetails for the given Offer.
-        """
-        request = self.context.get("request")
         return [
             {
                 "id": detail.id,
-                "url": request.build_absolute_uri(
-                    f"http://127.0.0.1:8000/api/offerdetails/{detail.id}/"
-                ) if request else f"http://127.0.0.1:8000/api/offerdetails/{detail.id}/"
+                "title": detail.title,
+                "revisions": detail.revisions,
+                "delivery_time_in_days": detail.delivery_time_in_days,
+                "price": detail.price,
+                "features": detail.features or [],
+                "offer_type": detail.offer_type,
+                "url": f"/offerdetails/{detail.id}/" 
             }
             for detail in obj.details.all()
         ]

@@ -6,7 +6,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.exceptions import NotFound, PermissionDenied
-from .serializers import RegistrationSerializer, LoginTokenSerializer, UserProfileSerializer
+from .serializers import RegistrationSerializer, LoginTokenSerializer, UserProfileSerializer, BusinessProfilesSerializer, CustomerProfilesSerializer
 from auth_app.models import UserProfile
 from reviews.models import Review
 from offers.models import Offer
@@ -143,7 +143,7 @@ class BusinessProfileListView(APIView):
         as serialized data for authenticated users.
         """
         business_profiles = UserProfile.objects.filter(type="business")
-        serializer = UserProfileSerializer(business_profiles, many=True)
+        serializer = BusinessProfilesSerializer(business_profiles, many=True)
         return Response(serializer.data)  
     
 
@@ -161,5 +161,5 @@ class CustomerProfileListView(APIView):
         as serialized data for authenticated users.
         """
         customer_profiles = UserProfile.objects.filter(type="customer")
-        serializer = UserProfileSerializer(customer_profiles, many=True)
+        serializer = CustomerProfilesSerializer(customer_profiles, many=True)
         return Response(serializer.data)  

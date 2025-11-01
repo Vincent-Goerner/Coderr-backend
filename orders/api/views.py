@@ -159,7 +159,10 @@ class CompletedOrderCountView(APIView):
         Returns 404 if the business user does not exist.
         """
         try:
-            business_user = User.objects.get(id=business_user_id)
+            business_user = User.objects.get(
+                id=business_user_id,
+                profile__type="business"
+            )
         except User.DoesNotExist:
             return Response({"detail": "No business user found with this ID."}, status=404)
         

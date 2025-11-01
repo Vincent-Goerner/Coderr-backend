@@ -25,7 +25,7 @@ class Order (models.Model):
     title = models.CharField(max_length=255)
     revisions = models.IntegerField()
     delivery_time_in_days = models.IntegerField()
-    price = models.DecimalField(max_digits=6, decimal_places=2)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
     features = models.JSONField(default=list)
     offer_type = models.CharField(max_length=8, choices=PAKET_TYPES)
     status = models.CharField(max_length=12, choices=STATUS, default='in_progress')

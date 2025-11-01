@@ -121,3 +121,50 @@ class UserProfileSerializer(serializers.ModelSerializer):
         instance.user.save()
         instance.save()
         return instance
+    
+class BusinessProfilesSerializer(serializers.ModelSerializer):
+    """
+    Serializer for managing UserProfile data, including nested User fields.
+    Supports reading user info about both User and UserProfile instances.
+    """
+    user = serializers.IntegerField(source='user.id', read_only=True)
+    username = serializers.CharField(source='user.username', read_only=True)
+    first_name = serializers.CharField(source="user.first_name", required=False)
+    last_name = serializers.CharField(source="user.last_name", required=False)
+
+    class Meta:
+        model = UserProfile
+        fields = (
+            'user',
+            'username',
+            'first_name',
+            'last_name',
+            'file',
+            'location',
+            'tel',
+            'description',
+            'working_hours',
+            'type',
+        )
+
+
+class CustomerProfilesSerializer(serializers.ModelSerializer):
+    """
+    Serializer for managing UserProfile data, including nested User fields.
+    Supports reading user info about both User and UserProfile instances.
+    """
+    user = serializers.IntegerField(source='user.id', read_only=True)
+    username = serializers.CharField(source='user.username', read_only=True)
+    first_name = serializers.CharField(source="user.first_name", required=False)
+    last_name = serializers.CharField(source="user.last_name", required=False)
+
+    class Meta:
+        model = UserProfile
+        fields = (
+            'user',
+            'username',
+            'first_name',
+            'last_name',
+            'file',
+            'type',
+        )
