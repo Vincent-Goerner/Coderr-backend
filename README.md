@@ -138,19 +138,6 @@ No dead/commented-out code
 
 PEP-8 Compliance: All Python files follow PEP-8 guidelines
 
-## 🚫 Security & .env
-
-This project uses a .env file to manage environment-specific and sensitive settings such as:
-
-SECRET_KEY
-
-DEBUG
-
-Database paths and other credentials
-
-The .env file is excluded from version control (.gitignore), but a .env.template is provided as a template.
-Please copy .env.template to .env and fill in your own values before running the project.
-
 ## 📄 License
 
 Open-source project for educational purposes. Not intended for commercial use.
